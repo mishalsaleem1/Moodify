@@ -152,7 +152,7 @@ const Login = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="glass-input w-full pl-12 focus:ring-2 focus:ring-cosmic-purple text-white dark:text-white"
+                  className="glass-input w-full pl-12 focus:ring-2 focus:ring-cosmic-purple text-gray-100 dark:text-gray-100"
                 />
               </div>
             </div>
@@ -168,7 +168,7 @@ const Login = () => {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="glass-input w-full pl-12 pr-12 focus:ring-2 focus:ring-cosmic-purple text-white dark:text-white"
+                  className="glass-input w-full pl-12 pr-12 focus:ring-2 focus:ring-cosmic-purple text-gray-100 dark:text-gray-100"
                 />
                 <button
                   type="button"
