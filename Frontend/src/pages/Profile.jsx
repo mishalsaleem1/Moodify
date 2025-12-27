@@ -156,35 +156,11 @@ const Profile = () => {
             {/* Action Buttons */}
             <div className="flex flex-col gap-3">
               <button
-                onClick={() => {
-                  toast.info('Edit profile feature coming soon!')
-                }}
-                className="flex items-center gap-2 bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white font-semibold px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all"
-              >
-                <Edit className="w-5 h-5" />
-                Edit Profile
-              </button>
-              <button
                 onClick={() => navigate('/settings')}
                 className="flex items-center gap-2 bg-white/5 backdrop-blur-md border border-white/10 dark:text-[#f8f8ff] text-gray-900 font-semibold px-6 py-3 rounded-xl hover:bg-white/10 hover:scale-[1.02] transition-all"
               >
                 <Settings className="w-5 h-5" />
                 Settings
-              </button>
-              <button
-                onClick={async () => {
-                  try {
-                    const url = await getSpotifyConnectUrl()
-                    // redirect the browser to Spotify auth
-                    window.location.href = url
-                  } catch (err) {
-                    toast.error('Unable to connect to Spotify')
-                  }
-                }}
-                className="flex items-center gap-2 btn-spotify text-white font-semibold px-6 py-3 rounded-xl hover:scale-[1.02] transition-all"
-              >
-                <Music className="w-5 h-5" />
-                {spotifyConnected ? 'Spotify Connected' : 'Connect Spotify'}
               </button>
             </div>
           </div>
