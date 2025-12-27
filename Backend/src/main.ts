@@ -5,29 +5,21 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
-  // Enable CORS with dynamic origin handler for better compatibility
+  // Health check endpoint
+  app.use('/api/health', (req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+  
+  // Enable CORS
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  
   app.enableCors({
-    origin: (origin, callback) => {
-      const allowedOrigins = [
-        'https://moodify-pnxy.vercel.app',
-        'http://localhost:5173',
-        'http://localhost:3000'
-      ];
-      
-      // Allow requests with no origin (mobile apps, curl, etc.)
-      if (!origin) {
-        console.log('✅ Allowing request with no origin');
-        return callback(null, true);
-      }
-      
-      if (allowedOrigins.includes(origin)) {
-        console.log(`✅ Allowing request from: ${origin}`);
-        callback(null, true);
-      } else {
-        console.log(`❌ Blocking request from: ${origin}`);
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: [
+      frontendUrl,
+      'https://moodify-pnxy.vercel.app',
+      'http://localhost:5173',
+      'http://localhost:3000'
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
@@ -35,16 +27,12 @@ async function bootstrap() {
       'Authorization', 
       'Accept',
       'X-Requested-With',
-      'Origin',
-      'Access-Control-Request-Method',
-      'Access-Control-Request-Headers'
+      'Origin'
     ],
     exposedHeaders: ['Authorization'],
-    preflightContinue: false,
     optionsSuccessStatus: 204,
   });
 
-  // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -53,22 +41,14 @@ async function bootstrap() {
     }),
   );
 
-  // Set global API prefix
   app.setGlobalPrefix('api');
 
   const port = process.env.PORT || 3001;
   
-  try {
-    await app.listen(port);
-    console.log(`🚀 Server running on http://localhost:${port}`);
-    console.log(`🔒 CORS enabled for: https://moodify-pnxy.vercel.app`);
-    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  } catch (error) {
-    console.error('❌ Failed to start server:', error);
-    throw error;
-  }
+  await app.listen(port, '0.0.0.0');
+  console.log(`🚀 Server running on port ${port}`);
+  console.log(`🔒 CORS enabled for: ${frontendUrl}`);
+  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
 }
-bootstrap().catch(err => {
-  console.error('Failed to start server:', err);
-  process.exit(1);
-});
+
+bootstrap();
