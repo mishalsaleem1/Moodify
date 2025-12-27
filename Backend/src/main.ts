@@ -11,7 +11,7 @@ async function bootstrap() {
     'https://moodify-pnxy.vercel.app',
     'http://localhost:5173',
     'http://localhost:3000'
-  ].filter(Boolean);
+  ].filter((origin): origin is string => Boolean(origin));
 
   console.log('🔒 CORS enabled for origins:', allowedOrigins);
 
