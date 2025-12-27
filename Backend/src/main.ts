@@ -40,6 +40,7 @@ async function bootstrap() {
   const port = process.env.PORT || 3001;
   await app.listen(port);
   console.log(`🚀 Server running on http://localhost:${port}`);
+  console.log(`✅ CORS enabled for: https://moodify-pnxy.vercel.app`);
 }
 bootstrap().catch(err => {
   console.error('Failed to start server:', err);
