@@ -176,7 +176,6 @@ const Playlists = () => {
     { id: 'saved', label: 'Your Songs', icon: Music, count: favorites.length },
     { id: 'playlists', label: 'Playlists', icon: ListMusic, count: playlists.length },
     { id: 'favorites', label: 'Favorites', icon: Heart, count: favorites.length },
-    { id: 'history', label: 'History', icon: Clock, count: 0 },
   ]
 
   // Filter data based on search query
