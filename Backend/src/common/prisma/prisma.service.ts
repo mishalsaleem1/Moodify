@@ -19,7 +19,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   }
 
   async onModuleInit() {
-    const maxRetries = 5;
+    const maxRetries = 3;
     let retries = 0;
 
     while (retries < maxRetries) {
@@ -30,7 +30,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       } catch (error) {
         retries++;
         this.logger.warn(
-          `⚠️ Database connection attempt ${retries}/${maxRetries} failed. Retrying in ${retries * 2}s...`,
+          `⚠️ Database connection attempt ${retries}/${maxRetries} failed.`,
         );
         
         if (retries === maxRetries) {
@@ -38,8 +38,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
           throw error;
         }
         
-        // Exponential backoff: wait longer between each retry
-        await new Promise(resolve => setTimeout(resolve, retries * 2000));
+        // Wait 1 second between retries
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
   }
