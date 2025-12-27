@@ -5,32 +5,24 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
-  // Enable CORS for frontend
-  const allowedOrigins = [
-    'https://moodify-pnxy.vercel.app',
-    process.env.FRONTEND_URL,
-    'http://localhost:5173',
-    'http://localhost:3000'
-  ].filter(Boolean);
-
+  // Enable CORS for frontend - simplified and permissive
   app.enableCors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        console.warn(`CORS blocked origin: ${origin}`);
-        callback(null, false);
-      }
-    },
+    origin: [
+      'https://moodify-pnxy.vercel.app',
+      'http://localhost:5173',
+      'http://localhost:3000'
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    allowedHeaders: [
+      'Content-Type', 
+      'Authorization', 
+      'Accept',
+      'X-Requested-With',
+      'Origin'
+    ],
     exposedHeaders: ['Authorization'],
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
+    maxAge: 3600,
   });
 
   // Global validation pipe
