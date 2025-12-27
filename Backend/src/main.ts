@@ -6,12 +6,17 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
   // Enable CORS for frontend - simplified and permissive
+  const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    'https://moodify-pnxy.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ].filter(Boolean);
+
+  console.log('🔒 CORS enabled for origins:', allowedOrigins);
+
   app.enableCors({
-    origin: [
-      'https://moodify-pnxy.vercel.app',
-      'http://localhost:5173',
-      'http://localhost:3000'
-    ],
+    origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
@@ -33,6 +38,15 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  // Health check endpoint (before global prefix)
+  app.getHttpAdapter().get('/', (req, res) => {
+    res.json({ 
+      status: 'ok', 
+      message: 'Moodify API is running',
+      timestamp: new Date().toISOString()
+    });
+  });
 
   // Set global API prefix
   app.setGlobalPrefix('api');
