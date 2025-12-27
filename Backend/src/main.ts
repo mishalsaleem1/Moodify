@@ -39,15 +39,6 @@ async function bootstrap() {
     }),
   );
 
-  // Health check endpoint (before global prefix)
-  app.getHttpAdapter().get('/', (req, res) => {
-    res.json({ 
-      status: 'ok', 
-      message: 'Moodify API is running',
-      timestamp: new Date().toISOString()
-    });
-  });
-
   // Set global API prefix
   app.setGlobalPrefix('api');
 
