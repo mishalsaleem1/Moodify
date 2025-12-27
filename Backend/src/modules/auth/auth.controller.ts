@@ -6,7 +6,7 @@ import { SpotifyAuthGuard } from './guards/spotify-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 import { Response } from 'express';
 
-@Controller('api/auth')
+@Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 

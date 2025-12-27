@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 
-@Controller('api/users')
+@Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 

@@ -4,7 +4,7 @@ import { CreateFeedbackDto, UpdateFeedbackDto } from './dto/feedback.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 
-@Controller('api/feedback')
+@Controller('feedback')
 export class FeedbackController {
   constructor(private feedbackService: FeedbackService) {}
 

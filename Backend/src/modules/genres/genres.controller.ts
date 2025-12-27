@@ -3,7 +3,7 @@ import { GenresService } from './genres.service';
 import { CreateGenreDto, UpdateGenreDto } from './dto/genre.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-@Controller('api/genres')
+@Controller('genres')
 export class GenresController {
   constructor(private genresService: GenresService) {}
 

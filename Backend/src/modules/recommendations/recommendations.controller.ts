@@ -4,7 +4,7 @@ import { CreateRecommendationDto, UpdateRecommendationDto } from './dto/recommen
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 
-@Controller('api/recommendations')
+@Controller('recommendations')
 export class RecommendationsController {
   constructor(private recommendationsService: RecommendationsService) {}
 

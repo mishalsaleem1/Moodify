@@ -3,7 +3,7 @@ import { MoodSongsService } from './mood-songs.service';
 import { CreateMoodSongDto, UpdateMoodSongDto } from './dto/mood-song.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-@Controller('api/mood-songs')
+@Controller('mood-songs')
 export class MoodSongsController {
   constructor(private moodSongsService: MoodSongsService) {}
 

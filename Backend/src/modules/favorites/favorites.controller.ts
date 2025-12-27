@@ -4,7 +4,7 @@ import { AddFavoriteDto } from './dto/favorite.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 
-@Controller('api/favorites')
+@Controller('favorites')
 export class FavoritesController {
   constructor(private favoritesService: FavoritesService) {}
 

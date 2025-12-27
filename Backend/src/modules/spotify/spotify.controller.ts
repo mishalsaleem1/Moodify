@@ -5,7 +5,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 import { PrismaService } from '../../common/prisma/prisma.service';
 
-@Controller('api/spotify')
+@Controller('spotify')
 export class SpotifyController {
   constructor(
     private spotify: SpotifyService,

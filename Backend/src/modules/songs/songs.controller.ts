@@ -3,7 +3,7 @@ import { SongsService } from './songs.service';
 import { CreateSongDto, UpdateSongDto } from './dto/song.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-@Controller('api/songs')
+@Controller('songs')
 export class SongsController {
   constructor(private songsService: SongsService) {}
 

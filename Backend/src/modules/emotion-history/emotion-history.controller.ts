@@ -4,7 +4,7 @@ import { CreateEmotionHistoryDto, UpdateEmotionHistoryDto } from './dto/emotion-
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 
-@Controller('api/emotion-history')
+@Controller('emotion-history')
 export class EmotionHistoryController {
   constructor(private emotionHistoryService: EmotionHistoryService) {}
 

@@ -4,7 +4,7 @@ import { CreatePlaylistDto, UpdatePlaylistDto, AddSongToPlaylistDto } from './dt
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 
-@Controller('api/playlists')
+@Controller('playlists')
 export class PlaylistsController {
   constructor(private playlistsService: PlaylistsService) {}
 
