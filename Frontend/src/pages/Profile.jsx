@@ -251,13 +251,6 @@ const Profile = () => {
               <LogOut className="w-5 h-5" />
               Logout
             </button>
-            <button
-              onClick={handleDeleteAccount}
-              className="flex items-center justify-center gap-2 bg-red-500/20 border border-red-500/30 text-red-400 font-semibold px-6 py-3 rounded-xl hover:bg-red-500/30 hover:scale-[1.02] transition-all"
-            >
-              <Trash2 className="w-5 h-5" />
-              Delete Account
-            </button>
           </div>
         </motion.div>
       </div>
