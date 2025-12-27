@@ -10,7 +10,10 @@ async function bootstrap() {
     origin: [
       'https://moodify-pnxy.vercel.app',
       'http://localhost:5173',
-      'http://localhost:3000'
+      'http://localhost:3000',
+      'https://moodify-pnxy.vercel.app/api',
+      'http://localhost:5173/api',
+      'http://localhost:3000/api'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
