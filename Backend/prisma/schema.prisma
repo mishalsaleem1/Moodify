@@ -1,0 +1,207 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication and profile management
+model User {
+  id                String              @id @default(cuid())
+  email             String              @unique
+  username          String              @unique
+  password          String
+  firstName         String?
+  lastName          String?
+  profileImage      String?
+  bio               String?
+  spotifyAccessToken String?            // Spotify OAuth token
+  spotifyTokenExpiry DateTime?           // When Spotify token expires
+  spotifyRefreshToken String?            // Spotify refresh token for long-term access
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  playlists         Playlist[]
+  favorites         Favorite[]
+  emotionHistory    EmotionHistory[]
+  recommendations   Recommendation[]
+  feedback          Feedback[]
+  sessions          Session[]
+}
+
+// Session model for authentication state management
+model Session {
+  id                String              @id @default(cuid())
+  userId            String
+  token             String              @unique
+  expiresAt         DateTime
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+}
+
+// Genre model for categorizing songs
+model Genre {
+  id                String              @id @default(cuid())
+  name              String              @unique
+  description       String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  songs             Song[]
+}
+
+// Song model
+model Song {
+  id                String              @id @default(cuid())
+  title             String
+  artist            String
+  album             String?
+  duration          Int?                // Duration in seconds
+  genreId           String?
+  spotifyId         String?             @unique  // External API ID
+  imageUrl          String?
+  previewUrl        String?             // Audio preview URL
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  genre             Genre?              @relation(fields: [genreId], references: [id], onDelete: SetNull)
+  playlists         PlaylistSong[]
+  favorites         Favorite[]
+  moodSongs         MoodSong[]
+  recommendations   Recommendation[]
+  
+  @@index([genreId])
+}
+
+// Playlist model
+model Playlist {
+  id                String              @id @default(cuid())
+  userId            String
+  name              String
+  description       String?
+  isPublic          Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  songs             PlaylistSong[]
+  
+  @@index([userId])
+}
+
+// Junction table for Playlist and Song (many-to-many)
+model PlaylistSong {
+  id                String              @id @default(cuid())
+  playlistId        String
+  songId            String
+  position          Int?                // Order of song in playlist
+  addedAt           DateTime            @default(now())
+  
+  // Relations
+  playlist          Playlist            @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  song              Song                @relation(fields: [songId], references: [id], onDelete: Cascade)
+  
+  @@unique([playlistId, songId])
+  @@index([playlistId])
+  @@index([songId])
+}
+
+// Favorite model for user's favorite songs
+model Favorite {
+  id                String              @id @default(cuid())
+  userId            String
+  songId            String
+  createdAt         DateTime            @default(now())
+  
+  // Relations
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  song              Song                @relation(fields: [songId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, songId])
+  @@index([userId])
+  @@index([songId])
+}
+
+// Emotion Detection History
+model EmotionHistory {
+  id                String              @id @default(cuid())
+  userId            String
+  emotion           String              // e.g., "happy", "sad", "energetic", "calm"
+  confidence        Float?              // Confidence score (0-1)
+  description       String?
+  detectedAt        DateTime            @default(now())
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([emotion])
+}
+
+// Mood-based Song Library mapping
+model MoodSong {
+  id                String              @id @default(cuid())
+  mood              String              // e.g., "happy", "sad", "energetic", "calm"
+  songId            String
+  relevanceScore    Float?              // How relevant the song is to the mood (0-1)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  song              Song                @relation(fields: [songId], references: [id], onDelete: Cascade)
+  
+  @@unique([mood, songId])
+  @@index([mood])
+  @@index([songId])
+}
+
+// Recommendations model
+model Recommendation {
+  id                String              @id @default(cuid())
+  userId            String
+  songId            String
+  reason            String?             // Why this song was recommended
+  liked             Boolean?            // User's feedback on recommendation
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  song              Song                @relation(fields: [songId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([songId])
+}
+
+// Feedback / Comments model
+model Feedback {
+  id                String              @id @default(cuid())
+  userId            String
+  title             String
+  message           String
+  rating            Int?                // 1-5 star rating
+  status            String              @default("pending")  // pending, reviewed, resolved
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([status])
+}

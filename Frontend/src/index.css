@@ -1,0 +1,195 @@
+/* Import Satoshi & Clash Display fonts */
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@1,2&f[]=clash-display@1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    border-color: theme('colors.gray.200');
+  }
+  
+  body {
+    @apply bg-gradient-to-br from-cosmic-darker via-cosmic-dark to-[#2d1b4e] text-text-primary transition-colors duration-300;
+    font-family: 'Satoshi', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold text-text-heading;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl font-clash;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl lg:text-5xl font-clash;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl font-satoshi;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl font-satoshi;
+  }
+}
+
+@layer components {
+  /* Glassmorphism components */
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl shadow-xl;
+  }
+  
+  .glass-card-lg {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl;
+  }
+
+  .glass-input {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-xl px-4 py-3
+           text-text-primary placeholder-text-secondary/50
+           focus:outline-none focus:ring-2 focus:ring-cosmic-purple focus:border-transparent
+           transition-all duration-200;
+  }
+
+  /* Premium buttons */
+  .btn {
+    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-200 
+           disabled:opacity-50 disabled:cursor-not-allowed
+           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cosmic-dark;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-cosmic-purple to-cosmic-light text-white 
+           hover:shadow-lg hover:shadow-cosmic-purple/50 hover:scale-105
+           active:scale-95 focus:ring-cosmic-purple;
+  }
+
+  .btn-secondary {
+    @apply glass-card text-text-primary hover:bg-white/10 hover:scale-105
+           active:scale-95 focus:ring-cosmic-light;
+  }
+
+  .btn-outline {
+    @apply border-2 border-cosmic-purple text-cosmic-purple hover:bg-cosmic-purple/10
+           hover:scale-105 active:scale-95 focus:ring-cosmic-purple;
+  }
+
+  .btn-danger {
+    @apply bg-gradient-to-r from-red-600 to-red-500 text-white 
+           hover:shadow-lg hover:shadow-red-500/50 hover:scale-105
+           active:scale-95 focus:ring-red-500;
+  }
+
+  .btn-spotify {
+    @apply bg-[#1DB954] text-white hover:bg-[#1ed760] 
+           hover:shadow-lg hover:shadow-[#1DB954]/50 hover:scale-105
+           active:scale-95;
+  }
+
+  /* Mood-based gradient backgrounds */
+  .mood-happy-bg {
+    @apply bg-gradient-to-br from-mood-happy via-yellow-500 to-orange-500;
+  }
+
+  .mood-sad-bg {
+    @apply bg-gradient-to-br from-mood-sad via-blue-600 to-indigo-600;
+  }
+
+  .mood-calm-bg {
+    @apply bg-gradient-to-br from-mood-calm via-emerald-600 to-teal-600;
+  }
+
+  .mood-angry-bg {
+    @apply bg-gradient-to-br from-mood-angry via-red-600 to-orange-600;
+  }
+
+  .mood-energetic-bg {
+    @apply bg-gradient-to-br from-mood-energetic via-pink-600 to-purple-600;
+  }
+
+  .mood-romantic-bg {
+    @apply bg-gradient-to-br from-mood-romantic via-rose-600 to-pink-600;
+  }
+
+  /* Song cards with premium hover effects */
+  .song-card {
+    @apply glass-card p-4 group cursor-pointer
+           hover:bg-white/10 hover:shadow-2xl hover:shadow-cosmic-purple/20
+           hover:scale-105 hover:-translate-y-1
+           transition-all duration-300;
+  }
+
+  /* Floating label input */
+  .floating-input {
+    @apply glass-input peer placeholder-transparent;
+  }
+
+  .floating-label {
+    @apply absolute left-4 -top-2.5 text-sm text-text-secondary
+           transition-all duration-200 pointer-events-none
+           peer-placeholder-shown:text-base peer-placeholder-shown:top-3
+           peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-cosmic-purple;
+  }
+
+  /* Moodify logo gradient */
+  .logo-gradient {
+    @apply bg-gradient-to-r from-cosmic-purple via-purple-500 to-pink-500 
+           bg-clip-text text-transparent;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 dark:bg-gray-600 rounded-full hover:bg-gray-500 dark:hover:bg-gray-500;
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+  background-size: 1000px 100%;
+}
+
+.dark .animate-shimmer {
+  background: linear-gradient(to right, #1f2937 0%, #374151 20%, #1f2937 40%, #1f2937 100%);
+  background-size: 1000px 100%;
+}
