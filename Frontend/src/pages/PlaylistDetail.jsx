@@ -177,21 +177,6 @@ const PlaylistDetail = () => {
             <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
               {playlist.songs?.length || playlist._count?.songs || 0} songs • Created {new Date(playlist.createdAt || playlist.created_at).toLocaleDateString()}
             </p>
-            
-            <div className="flex space-x-3">
-              <Button>
-                <FiPlus className="mr-2" />
-                Add Songs
-              </Button>
-              <Button variant="outline">
-                <FiEdit className="mr-2" />
-                Edit
-              </Button>
-              <Button variant="danger" onClick={handleDelete}>
-                <FiTrash2 className="mr-2" />
-                Delete
-              </Button>
-            </div>
           </div>
         </div>
       </motion.div>
