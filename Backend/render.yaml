@@ -26,3 +26,10 @@ services:
         sync: false
       - key: SPOTIFY_REDIRECT_URI
         sync: false
+      # Google OAuth Configuration
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        sync: false
