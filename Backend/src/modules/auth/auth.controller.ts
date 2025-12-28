@@ -6,10 +6,14 @@ import { SpotifyAuthGuard } from './guards/spotify-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 import { Response } from 'express';
 import { GoogleTokenResponse, GoogleUserInfo } from './interfaces/google.interface';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService,
+  ) {}
 
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
@@ -154,14 +158,21 @@ export class AuthController {
       console.log('✅ User authenticated successfully');
       console.log('🔄 Redirecting to frontend with token...');
       
-      // Redirect to frontend with token
-      const redirectUrl = `http://localhost:5173/auth/google/callback?token=${result.accessToken}`;
-      console.log('🔗 Redirect URL:', redirectUrl);
+      // Get frontend URL from environment
+      const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
+      const redirectUrl = `${frontendUrl}/auth/google/callback?token=${result.accessToken}`;
+      
+      console.log('🔗 Frontend URL:', frontendUrl);
+      console.log('🔗 Full Redirect URL:', redirectUrl);
+      
       res.redirect(redirectUrl);
     } catch (error) {
       console.error('❌ Google callback error:', error);
       console.error('Error stack:', error.stack);
-      res.redirect('http://localhost:5173/login?error=google_auth_failed');
+      
+      // Get frontend URL from environment for error redirect too
+      const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
+      res.redirect(`${frontendUrl}/login?error=google_auth_failed`);
     }
   }
 }
