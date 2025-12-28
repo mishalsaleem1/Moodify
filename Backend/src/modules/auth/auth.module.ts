@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { SpotifyStrategy } from './strategies/spotify.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 import { PrismaModule } from '../../common/prisma/prisma.module';
 
 @Module({
@@ -21,7 +22,7 @@ import { PrismaModule } from '../../common/prisma/prisma.module';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, JwtStrategy, SpotifyStrategy],
+  providers: [AuthService, JwtStrategy, SpotifyStrategy, GoogleStrategy],
   controllers: [AuthController],
   exports: [AuthService],
 })

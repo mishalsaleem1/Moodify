@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { RegisterDto, LoginDto, UpdatePasswordDto } from './dto/auth.dto';
+import { GoogleOAuthUser } from './dto/google-oauth.dto';
 import { SpotifyTokenResponse, SpotifyUserProfile } from './interfaces/spotify.interface';
 
 @Injectable()
@@ -248,6 +249,54 @@ export class AuthService {
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
     }
+  }
+
+  // Google OAuth methods
+  async handleGoogleLogin(googleUser: GoogleOAuthUser): Promise<any> {
+    const { email, firstName, lastName, picture, googleId } = googleUser;
+
+    // Find or create user
+    let user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      // Generate unique username from email
+      let username = email.split('@')[0];
+      
+      // Check if username already exists and make it unique if needed
+      const existingUsername = await this.prisma.user.findUnique({
+        where: { username },
+      });
+      
+      if (existingUsername) {
+        username = `${username}_${Date.now()}`;
+      }
+
+      // Create new user from Google profile
+      user = await this.prisma.user.create({
+        data: {
+          email,
+          username,
+          password: await bcrypt.hash(Math.random().toString(), 10), // Random password for OAuth users
+          firstName: firstName || 'Google User',
+          lastName: lastName || '',
+          profileImage: picture,
+          googleId: googleId,
+        },
+      });
+    } else if (!user.googleId) {
+      // Update existing user with Google ID if not already set
+      user = await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          googleId: googleId,
+          profileImage: picture || user.profileImage,
+        },
+      });
+    }
+
+    return this.generateAuthResponse(user);
   }
 
   private async generateAuthResponse(user: any) {

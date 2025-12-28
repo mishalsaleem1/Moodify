@@ -18,6 +18,7 @@ import History from './pages/History'
 import Profile from './pages/Profile'
 import Settings from './pages/Settings'
 import SpotifyCallback from './pages/SpotifyCallback'
+import GoogleCallback from './pages/GoogleCallback'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -91,6 +92,7 @@ function App() {
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/spotify-callback" element={<SpotifyCallback />} />
+      <Route path="/auth/google/callback" element={<GoogleCallback />} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

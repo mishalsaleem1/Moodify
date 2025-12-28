@@ -203,6 +203,12 @@ export const AuthProvider = ({ children }) => {
     setError(null)
   }, [])
 
+  // Manual user setter (for OAuth callbacks)
+  const setAuthUser = useCallback((userData) => {
+    setUser(userData)
+    setIsAuthenticated(!!userData)
+  }, [])
+
   const value = {
     user,
     loading,
@@ -213,6 +219,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateUser,
     clearError,
+    setUser: setAuthUser, // Expose for OAuth callbacks
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -23,6 +23,7 @@ model User {
   spotifyAccessToken String?            // Spotify OAuth token
   spotifyTokenExpiry DateTime?           // When Spotify token expires
   spotifyRefreshToken String?            // Spotify refresh token for long-term access
+  googleId          String?             @unique  // Google OAuth ID
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   
