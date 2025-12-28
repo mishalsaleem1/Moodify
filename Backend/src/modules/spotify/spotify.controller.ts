@@ -12,6 +12,65 @@ export class SpotifyController {
     private prisma: PrismaService,
   ) {}
 
+  /**
+   * SEARCH TRACKS - No authentication required (uses Client Credentials Flow)
+   * Query params:
+   *   - q: search query (required)
+   *   - limit: number of results (optional, default: 20, max: 50)
+   * 
+   * Example: /api/spotify/search?q=happy songs&limit=10
+   */
+  @Get('search')
+  async searchTracks(
+    @Query('q') query: string,
+    @Query('limit') limit?: string,
+  ) {
+    const limitNum = limit ? parseInt(limit, 10) : 20;
+    
+    console.log(`🔍 Search request - Query: "${query}", Limit: ${limitNum}`);
+    
+    try {
+      const results = await this.spotify.searchTracks(query, limitNum);
+      console.log(`✅ Returning ${results.tracks?.items?.length || 0} tracks`);
+      return results;
+    } catch (error) {
+      console.error('❌ Search error:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * MOOD-BASED RECOMMENDATIONS - No authentication required
+   * Query params:
+   *   - mood: mood name (required) - happy, sad, calm, energetic, etc.
+   *   - limit: number of results (optional, default: 20)
+   * 
+   * Example: /api/spotify/mood-recommendations?mood=happy&limit=15
+   */
+  @Get('mood-recommendations')
+  async getMoodRecommendations(
+    @Query('mood') mood: string,
+    @Query('limit') limit?: string,
+  ) {
+    const limitNum = limit ? parseInt(limit, 10) : 20;
+    
+    console.log(`🎵 Mood recommendations request - Mood: ${mood}, Limit: ${limitNum}`);
+    
+    try {
+      const results = await this.spotify.getMoodRecommendationsWithClientCredentials(
+        mood || 'happy',
+        limitNum,
+      );
+      console.log(`✅ Returning ${results.tracks?.length || 0} recommendations`);
+      return results;
+    } catch (error) {
+      console.error('❌ Mood recommendations error:', error.message);
+      throw error;
+    }
+  }
+
+  // ========== EXISTING USER-AUTHENTICATED ENDPOINTS (kept for backward compatibility) ==========
+
   @Get('login')
   @UseGuards(JwtAuthGuard)
   login() {

@@ -397,6 +397,40 @@ export const favoritesService = {
  * Spotify Service
  */
 export const spotifyService = {
+  // ========== NEW: CLIENT CREDENTIALS FLOW (NO LOGIN REQUIRED) ==========
+  
+  // Search Spotify tracks (no auth required)
+  searchSpotifyTracks: async (query, limit = 20) => {
+    console.log(`🔍 Searching Spotify: "${query}" (limit: ${limit})`);
+    try {
+      const response = await api.get('/spotify/search', {
+        params: { q: query, limit },
+      });
+      console.log(`✅ Found ${response.data.tracks?.items?.length || 0} tracks`);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Spotify search error:', error);
+      throw error;
+    }
+  },
+
+  // Get mood recommendations (no auth required)
+  getSpotifyMoodRecommendations: async (mood, limit = 20) => {
+    console.log(`🎵 Getting Spotify recommendations for mood: ${mood}`);
+    try {
+      const response = await api.get('/spotify/mood-recommendations', {
+        params: { mood, limit },
+      });
+      console.log(`✅ Got ${response.data.tracks?.length || 0} recommendations`);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Spotify mood recommendations error:', error);
+      throw error;
+    }
+  },
+
+  // ========== OAUTH FLOW (USER LOGIN REQUIRED) ==========
+  
   // Get Spotify authorization URL
   getAuthUrl: async () => {
     const response = await api.get(API_ENDPOINTS.CONNECT_SPOTIFY)

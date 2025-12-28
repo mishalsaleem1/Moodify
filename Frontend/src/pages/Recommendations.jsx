@@ -55,6 +55,7 @@ const SongCard = memo(({ song, index, onLike, onAdd, onPlay, currentlyPlaying, i
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-2xl shadow-purple-500/50 hover:shadow-purple-500/80 transition-shadow"
+              title={song.previewUrl ? "Play 30s preview" : "Open in Spotify"}
             >
               {isThisSongPlaying ? (
                 <Pause className="w-7 h-7 text-white" fill="white" />
@@ -62,11 +63,27 @@ const SongCard = memo(({ song, index, onLike, onAdd, onPlay, currentlyPlaying, i
                 <Play className="w-7 h-7 text-white ml-1" fill="white" />
               )}
             </motion.button>
+            
+            {/* Preview availability indicator */}
+            {!song.previewUrl && (
+              <div className="absolute bottom-2 left-2 right-2 bg-black/80 backdrop-blur-sm px-2 py-1 rounded-lg">
+                <p className="text-xs text-white/90 text-center">
+                  🎵 No preview - Opens Spotify
+                </p>
+              </div>
+            )}
           </motion.div>
 
           {/* Match Badge */}
-          <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
-            <span className="text-xs font-bold text-white">{song.match}% Match</span>
+          <div className="absolute top-3 right-3 flex flex-col gap-1">
+            <div className="bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
+              <span className="text-xs font-bold text-white">{song.match}% Match</span>
+            </div>
+            {song.previewUrl && (
+              <div className="bg-green-500/90 backdrop-blur-md px-2 py-1 rounded-full border border-green-400/50">
+                <span className="text-xs font-bold text-white">▶ Preview</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -180,54 +197,10 @@ const Recommendations = () => {
         setLoading(true)
         setError(null)
         
-        // Check if Spotify token exists
-        const spotifyToken = localStorage.getItem('spotify_access_token')
-        console.log('🔑 Spotify token exists:', !!spotifyToken)
+        console.log('📡 Fetching Spotify mood recommendations (Client Credentials - No login required)...')
         
-        if (!spotifyToken) {
-          console.log('⚠️  No Spotify token - using FREE iTunes API instead')
-          
-          // Use iTunes API - completely free, no authentication required!
-          try {
-            const response = await spotifyService.getITunesMoodSongs(selectedMood, 20)
-            console.log('✅ iTunes API response:', response)
-            
-            const tracks = response.tracks || []
-            console.log('🎵 Number of tracks received:', tracks.length)
-            
-            const formattedRecommendations = tracks.map((track, index) => ({
-              id: track.id,
-              title: track.name,
-              artist: track.artists.map(a => a.name).join(', '),
-              album_art: track.album?.images?.[0]?.url || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&h=500&fit=crop',
-              match: Math.max(70, 95 - index * 1), // Calculate match score
-              is_liked: false,
-              previewUrl: track.preview_url,
-              externalUrl: track.external_urls?.apple,
-            }))
-            
-            console.log('✅ Formatted iTunes recommendations:', formattedRecommendations)
-            setRecommendations(formattedRecommendations)
-            toast.success(`🎵 Found ${formattedRecommendations.length} ${selectedMood} songs from iTunes!`)
-            setLoading(false)
-            return
-          } catch (itunesError) {
-            console.error('❌ iTunes API failed, using hardcoded fallback:', itunesError)
-            // Final fallback to hardcoded songs
-            setRecommendations([
-              { id: 1, title: 'Blinding Lights', artist: 'The Weeknd', album_art: 'https://images.unsplash.com/photo-1614149162883-504ce4d13909?w=500&h=500&fit=crop', match: 95, is_liked: false },
-              { id: 2, title: 'Levitating', artist: 'Dua Lipa', album_art: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&h=500&fit=crop', match: 92, is_liked: false },
-              { id: 3, title: 'Watermelon Sugar', artist: 'Harry Styles', album_art: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=500&h=500&fit=crop', match: 89, is_liked: false },
-              { id: 4, title: 'Stay', artist: 'The Kid LAROI', album_art: 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=500&h=500&fit=crop', match: 87, is_liked: false },
-            ])
-            toast.info('🎵 Connect Spotify for personalized recommendations!')
-            setLoading(false)
-            return
-          }
-        }
-
-        console.log('📡 Calling Spotify API for mood-based recommendations...')
-        const response = await spotifyService.getMoodBasedRecommendations(spotifyToken, selectedMood)
+        // Use our new Spotify Client Credentials endpoint (no user login required!)
+        const response = await spotifyService.getSpotifyMoodRecommendations(selectedMood, 20)
         console.log('✅ Spotify API response:', response)
         
         // Transform Spotify tracks to our format
@@ -322,7 +295,17 @@ const Recommendations = () => {
     
     // Check if song has preview URL
     if (!song.previewUrl) {
-      toast.error('No preview available for this song 🙁')
+      // Open in Spotify as fallback
+      if (song.externalUrl) {
+        toast.info('No preview available - Opening in Spotify! 🎵', {
+          duration: 3000,
+        })
+        setTimeout(() => {
+          window.open(song.externalUrl, '_blank')
+        }, 500)
+      } else {
+        toast.error('No preview available for this song 🙁')
+      }
       return
     }
     
@@ -339,14 +322,41 @@ const Recommendations = () => {
       if (audioRef.current) {
         audioRef.current.pause()
         audioRef.current.src = song.previewUrl
+        
+        // Add event listeners
+        audioRef.current.onloadstart = () => {
+          console.log('🔄 Loading preview...')
+          toast.loading('Loading preview...', { id: 'audio-loading' })
+        }
+        
+        audioRef.current.oncanplay = () => {
+          console.log('✅ Preview ready to play')
+          toast.dismiss('audio-loading')
+        }
+        
+        audioRef.current.onerror = (e) => {
+          console.error('❌ Audio error:', e)
+          toast.dismiss('audio-loading')
+          toast.error('Failed to load preview. Opening in Spotify...')
+          if (song.externalUrl) {
+            setTimeout(() => window.open(song.externalUrl, '_blank'), 500)
+          }
+        }
+        
         await audioRef.current.play()
         setCurrentlyPlaying(song)
         setIsPlaying(true)
-        toast.success(`🎵 Now playing: ${song.title}`)
+        toast.success(`🎵 Playing 30s preview: ${song.title}`)
       }
     } catch (error) {
       console.error('❌ Error playing audio:', error)
       toast.error('Failed to play preview')
+      
+      // Fallback to opening in Spotify
+      if (song.externalUrl) {
+        toast.info('Opening in Spotify instead...')
+        setTimeout(() => window.open(song.externalUrl, '_blank'), 500)
+      }
     }
   }
 
@@ -645,6 +655,21 @@ const Recommendations = () => {
                     <p className="text-xl text-[#e0dfff]/70">
                       <span className="font-semibold text-white">{sortedRecommendations.length} songs</span> perfectly matched to your vibe
                     </p>
+                    
+                    {/* Preview info */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="inline-flex items-center gap-2 bg-blue-500/10 backdrop-blur-md px-4 py-2 rounded-full border border-blue-400/30"
+                    >
+                      <Play className="w-4 h-4 text-blue-400" />
+                      <span className="text-sm text-blue-300">
+                        {sortedRecommendations.filter(s => s.previewUrl).length > 0 
+                          ? `${sortedRecommendations.filter(s => s.previewUrl).length} with 30s preview` 
+                          : 'Click play to open in Spotify'}
+                      </span>
+                    </motion.div>
                   </div>
 
                   {/* Filter Button */}

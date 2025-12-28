@@ -1,52 +1,102 @@
 # Spotify API Integration
 
-This module provides full integration with the Spotify Web API, allowing users to:
-- Authenticate with Spotify (OAuth)
-- Fetch user's top tracks and artists
-- Get Spotify recommendations
-- Search for tracks
-- Sync Spotify data to the database
+This module provides full integration with the Spotify Web API using **two authentication methods**:
 
-## Setup
+## 🔐 Authentication Methods
 
-### 1. Register your application on Spotify Developer
+### 1. **Client Credentials Flow** (NEW - NO USER LOGIN REQUIRED)
+- ✅ **App-level access** - Access Spotify catalog without user authentication
+- ✅ **Search tracks** - Search for any song, artist, album
+- ✅ **Get recommendations** - Mood-based song recommendations
+- ✅ **Automatic token refresh** - Handles 1-hour token expiration
+- ✅ **Perfect for**: Mood detection, search features, public recommendations
 
+### 2. **Authorization Code Flow** (Existing - User Authentication)
+- ✅ **User-specific data** - Access user's top tracks, playlists, library
+- ✅ **Personalized recommendations** - Based on user's listening history
+- ✅ **Save to library** - Add tracks to user's Spotify library
+- ✅ **Perfect for**: User profiles, personalized features
+
+---
+
+## 🚀 Quick Start (Client Credentials Flow)
+
+### 1. Get Spotify Credentials
 1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-2. Create a new application
-3. Accept the terms and create the app
-4. Copy your **Client ID** and **Client Secret**
+2. Click **"Create App"**
+3. Copy your **Client ID** and **Client Secret**
 
-### 2. Configure environment variables
-
-Add to `.env`:
+### 2. Configure Environment Variables
+Add to `Backend/.env`:
 ```env
-SPOTIFY_CLIENT_ID=your_client_id
-SPOTIFY_CLIENT_SECRET=your_client_secret
+SPOTIFY_CLIENT_ID=your_client_id_here
+SPOTIFY_CLIENT_SECRET=your_client_secret_here
 SPOTIFY_REDIRECT_URI=http://localhost:3001/api/spotify/callback
 ```
 
-### 3. Set redirect URI in Spotify Dashboard
+### 3. Start Using
+No additional setup needed! The service automatically handles token management.
 
-1. Go to your app settings on Spotify Dashboard
-2. Add Redirect URI: `http://localhost:3001/api/spotify/callback`
+---
 
-## API Endpoints
+## 📡 API Endpoints
 
-### Authentication
+### 🆕 Client Credentials Flow Endpoints (No Auth Required)
 
-#### 1. Get Authorization URL
+#### 1. Search Tracks
 ```http
-GET /api/spotify/login
+GET /api/spotify/search?q={query}&limit={limit}
 ```
-Redirects to Spotify's authorization page.
 
-#### 2. Handle Callback
+**Parameters:**
+- `q` (required): Search query (song name, artist, keywords)
+- `limit` (optional): Number of results (default: 20, max: 50)
+
+**Example:**
+```bash
+curl "http://localhost:3001/api/spotify/search?q=happy%20songs&limit=10"
+```
+
+**Response:**
+```json
+{
+  "tracks": {
+    "items": [
+      {
+        "id": "spotify_track_id",
+        "name": "Song Name",
+        "artists": [{"id": "...", "name": "Artist Name"}],
+        "album": {
+          "name": "Album Name",
+          "images": [{"url": "https://..."}]
+        },
+        "preview_url": "https://...30sec.mp3",
+        "external_urls": {"spotify": "https://open.spotify.com/track/..."}
+      }
+    ]
+  }
+}
+```
+
+#### 2. Mood-Based Recommendations
 ```http
-POST /api/spotify/callback?code=<AUTH_CODE>
+GET /api/spotify/mood-recommendations?mood={mood}&limit={limit}
 ```
-Exchanges authorization code for access token.
 
-### User Data
+**Parameters:**
+- `mood` (required): Mood name - `happy`, `sad`, `calm`, `energetic`, `romantic`, `party`, `focus`, `angry`
+- `limit` (optional): Number of results (default: 20)
+
+**Example:**
+```bash
+curl "http://localhost:3001/api/spotify/mood-recommendations?mood=happy&limit=15"
+```
+
+**Response:** Same format as search tracks
+
+---
+
+### 👤 User Authentication Flow Endpoints (Requires User Login)
 
 #### Get Top Tracks
 ```http
