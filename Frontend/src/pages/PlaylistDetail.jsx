@@ -76,7 +76,10 @@ const PlaylistDetail = () => {
         const spotifyId = song.spotifyId || song.spotify_id
         if (spotifyId) {
           const spotifyUrl = `https://open.spotify.com/track/${spotifyId}`
-          toast.info('No preview available - Opening in Spotify! 🎵', { duration: 3000 })
+          toast('No preview available - Opening in Spotify! 🎵', { 
+            duration: 3000,
+            icon: '🎵'
+          })
           setTimeout(() => {
             window.open(spotifyUrl, '_blank')
           }, 500)
@@ -98,21 +101,23 @@ const PlaylistDetail = () => {
         if (audioRef.current) {
           audioRef.current.src = previewUrl
           
-          audioRef.current.onloadstart = () => {
-            toast.loading('Loading preview...', { id: 'audio-loading' })
-          }
+          const loadingToast = toast.loading('Loading preview...')
           
           audioRef.current.oncanplay = () => {
-            toast.dismiss('audio-loading')
+            toast.dismiss(loadingToast)
           }
           
           audioRef.current.onerror = (e) => {
             console.error('❌ Audio error:', e)
-            toast.dismiss('audio-loading')
-            toast.error('Failed to load preview. Opening in Spotify...')
+            toast.dismiss(loadingToast)
             const spotifyId = song.spotifyId || song.spotify_id
             if (spotifyId) {
+              toast('Failed to load preview. Opening in Spotify...', {
+                icon: '🎵'
+              })
               setTimeout(() => window.open(`https://open.spotify.com/track/${spotifyId}`, '_blank'), 500)
+            } else {
+              toast.error('Failed to load preview')
             }
           }
           
@@ -124,13 +129,14 @@ const PlaylistDetail = () => {
       }
     } catch (error) {
       console.error('Error playing song:', error)
-      toast.error('Failed to play preview')
       
       // Fallback to Spotify
       const spotifyId = song.spotifyId || song.spotify_id
       if (spotifyId) {
-        toast.info('Opening in Spotify instead...')
+        toast('Opening in Spotify...', { icon: '🎵' })
         setTimeout(() => window.open(`https://open.spotify.com/track/${spotifyId}`, '_blank'), 500)
+      } else {
+        toast.error('Failed to play preview')
       }
     }
   }
